@@ -101,8 +101,7 @@ def data_generator(steerings, image_stamps, image_folder,
             x = np.concatenate(x_buffer, axis=0)[indx[:batch_size], ...]
             y = np.concatenate(y_buffer, axis=0)[indx[:batch_size], ...]
             x_buffer, y_buffer, buffer_size = [], [], 0
-            # Below is the standard definition. yield + input, output(target).
-            yield normalize_input(x.astype(np.float32)), exact_output(y)            
+            yield normalize_input(x.astype(np.float32)), exact_output(y)
         if shuffle:
             i = np.random.randint(start, end)
         else:

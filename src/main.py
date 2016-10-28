@@ -27,6 +27,7 @@ def train_model(steering_log,model_cnn,image_log,image_folder,camera,batch_size,
                                  camera=camera,
                                  batch_size=batch_size,
                                  image_size=image_size,
+                                 timestamp_end=14751877262-640,
                                  shuffle = True)
 	model_saver = ModelCheckpoint(filepath="cnn_weights.hdf5", verbose=1, save_best_only=False)
 	model_cnn.fit_generator(train_generator, samples_per_epoch=samples_per_epoch, nb_epoch=nb_epoch,
@@ -56,12 +57,22 @@ def test_predict(test_image_log,test_image_folder,camera,image_size,test_batch_s
 			test_x = np.concatenate(images_buffer, axis=0)
 			buffer_size,images_buffer=0,[]
 			test_y = model_cnn.predict(test_x)
+			mask_up=test_y>9.42
+			mask_down=test_y<-9.42
+			test_y[mask_up]=9.42
+			test_y[mask_down]=-9.42
+			#print ('test_y', test_y)
 			predict_steer_store.extend(test_y)
 	#the last insufficient buffer size images
 	if images_buffer:
 		print ('Predict last insufficient batch size images:%s ' %buffer_size)
 		test_x = np.concatenate(images_buffer, axis=0)
 		test_y = model_cnn.predict(test_x)
+		#print ('test_y', test_y)
+		mask_up=test_y>9.42
+		mask_down=test_y<-9.42
+		test_y[mask_up]=9.42
+		test_y[mask_down]=-9.42
 		predict_steer_store.extend(test_y)
 	#Write the predict results to csv file
 	predict_steering_dict = dict(zip(timestamps_store,predict_steer_store))

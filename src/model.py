@@ -12,28 +12,32 @@ def build_cnn(image_size=None):
 	else:
 	    input_shape = image_size + (3, )
 
-	img_input = Input(input_shape)
+	#img_input = Input(input_shape)
+	inputShape=input_shape
 
-	x = Convolution2D(64, 3, 3, activation='relu', border_mode='same')(img_input)
-	x = Dropout(0.5)(x)
-	x = Convolution2D(64, 3, 3, activation='relu', border_mode='same')(x)
-	x = Dropout(0.5)(x)
-	x = MaxPooling2D((2, 2), strides=(2, 2))(x)
+	############################# 3 conv  ##################################
+	
+	model=Sequential()
+	model.add(Convolution2D(64,3,3, activation='relu', border_mode='same', input_shape=inputShape))
+	model.add(Dropout(0.5))
+	model.add(Convolution2D(64,3,3, activation='relu', border_mode='same'))
+	model.add(Dropout(0.5))
+	model.add(MaxPooling2D((2, 2), strides=(2, 2)))
+	model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same'))
+	model.add(Dropout(0.5))
+	model.add(MaxPooling2D((2, 2), strides=(2, 2)))
+	model.add(Convolution2D(128, 2, 2, activation='relu', border_mode='same'))
+	model.add(Dropout(0.5))
+	model.add(MaxPooling2D((2, 2), strides=(2, 2)))
+	##
+	model.add(Flatten())
+	model.add(Dense(4096, activation='relu'))
+	model.add(Dropout(0.5))
+	model.add(Dense(1024, activation='relu'))
+	model.add(Dropout(0.5))
+	model.add(Dense(1))
+	
 
-	x = Convolution2D(128, 3, 3, activation='relu', border_mode='same')(x)
-	x = Dropout(0.5)(x)
-	# it doesn't fit in my GPU
-	# x = Convolution2D(128, 3, 3, activation='relu', border_mode='same')(x)
-	# x = Dropout(0.5)(x)
-	x = MaxPooling2D((2, 2), strides=(2, 2))(x)
-
-	y = Flatten()(x)
-	y = Dense(1024, activation='relu')(y)
-	y = Dropout(.5)(y)
-	y = Dense(1024, activation='relu')(y)
-	y = Dropout(.5)(y)
-	y = Dense(1)(y)
-
-	model = Model(input=img_input, output=y)
+	
 	model.compile(optimizer=Adam(lr=1e-4), loss = 'mse')
 	return model
