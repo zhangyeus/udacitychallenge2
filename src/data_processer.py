@@ -62,7 +62,7 @@ def normalize_output(y):
 	return y / 5. 
 
 def data_generator(steerings, image_stamps, image_folder, 
-                   batch_size=32, camera='center', fps=10, image_size=0.5,
+                   batch_size=8, camera='center', fps=10, image_size=0.5,
                    timestamp_start=None, timestamp_end=None, shuffle=True):
     # setup
     minmax = lambda xs: (min(xs), max(xs))

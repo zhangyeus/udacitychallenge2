@@ -14,9 +14,32 @@ def build_cnn(image_size=None):
 
 	#img_input = Input(input_shape)
 	inputShape=input_shape
+	############################ Nvidia ###################################
 
-	############################# 3 conv  ##################################
+	############################# 4 conv  ##################################
 	
+	model=Sequential()
+	model.add(Convolution2D(64,3,3, activation='relu', border_mode='same', input_shape=inputShape))
+	model.add(Dropout(0.5))
+	#model.add(Convolution2D(64,3,3, activation='relu', border_mode='same'))
+	#model.add(Dropout(0.5))
+	#model.add(MaxPooling2D((2, 2), strides=(2, 2)))
+	model.add(Convolution2D(128, 2, 2, activation='relu', border_mode='same'))
+	model.add(Dropout(0.5))
+	model.add(MaxPooling2D((2, 2), strides=(2, 2)))
+	model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same'))
+	model.add(Dropout(0.5))
+	model.add(MaxPooling2D((2, 2), strides=(2, 2)))
+	##
+	model.add(Flatten())
+	model.add(Dense(1024, activation='relu'))
+	model.add(Dropout(0.5))
+	model.add(Dense(1024, activation='relu'))
+	model.add(Dropout(0.5))
+	model.add(Dense(1))
+	
+	##########################$ 6 conv ############################
+	'''
 	model=Sequential()
 	model.add(Convolution2D(64,3,3, activation='relu', border_mode='same', input_shape=inputShape))
 	model.add(Dropout(0.5))
@@ -25,18 +48,22 @@ def build_cnn(image_size=None):
 	model.add(MaxPooling2D((2, 2), strides=(2, 2)))
 	model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same'))
 	model.add(Dropout(0.5))
-	model.add(MaxPooling2D((2, 2), strides=(2, 2)))
-	model.add(Convolution2D(128, 2, 2, activation='relu', border_mode='same'))
+	model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same'))
 	model.add(Dropout(0.5))
 	model.add(MaxPooling2D((2, 2), strides=(2, 2)))
+	#model.add(MaxPooling2D((2, 2), strides=(2, 2)))
+	#model.add(Convolution2D(48, 2, 2, activation='relu', border_mode='same'))
+	#model.add(Dropout(0.5))
+	#model.add(MaxPooling2D((2, 2), strides=(2, 2)))
 	##
 	model.add(Flatten())
-	model.add(Dense(4096, activation='relu'))
-	model.add(Dropout(0.5))
 	model.add(Dense(1024, activation='relu'))
 	model.add(Dropout(0.5))
+	model.add(Dense(1024, activation='relu'))
+	#model.add(Dropout(0.5))
 	model.add(Dense(1))
-	
+	'''
+	###############################################################
 
 	
 	model.compile(optimizer=Adam(lr=1e-4), loss = 'mse')

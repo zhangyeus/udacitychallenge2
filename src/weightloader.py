@@ -94,10 +94,10 @@ def main():
 
 	parser.add_argument('--resized-image-width', type=int, default=60, help='image resizing')
 	parser.add_argument('--resized-image-height', type=int,default=80, help='image resizing')
-	parser.add_argument('--nb-epoch', type=int, default=4, help='# of training epoch')
-	parser.add_argument('--trainNum', type=int, default=4, help='# of training total')
+	parser.add_argument('--nb-epoch', type=int, default=1, help='# of training epoch')
+	parser.add_argument('--trainNum', type=int, default=1, help='# of training total')
 	parser.add_argument('--camera', type=str, default='center', help='camera to use, default is center')
-	parser.add_argument('--batch_size', type=int, default=4, help='training batch size')
+	parser.add_argument('--batch_size', type=int, default=1, help='training batch size')
 	parser.add_argument('--test-batch_size', type=int, default=20, help='testing batch size')
 	args = parser.parse_args()
 
@@ -126,17 +126,14 @@ def main():
 
 	model_cnn = build_cnn(image_size)
 	print('model  build successful...')
+	print('load weight...')
+	load_trained_model(model=model_cnn,weights_path=weights_path1)
+	print('load weight successfully...')
+
 	###############################################################
 	ii=1
 	while (ii <= train_Num ):
-		if (ii<=1):
-			batch_size=20
-		if (ii>1 and ii<=2):
-			batch_size=8
-		if (ii>2 and ii<=3):
-			batch_size=4
-		if (ii > 3):
-			batch_size=2
+		batch_size=1
 
 		print("start: ",ii,'/',train_Num)
 		print("batchsize: ",batch_size)
