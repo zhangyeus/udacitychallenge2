@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import csv
 import argparse
 import numpy as np
+import keras.backend as K 
 from os import path
 import time
 from data_processer import *
@@ -55,8 +56,9 @@ def test_predict(test_image_log,test_image_folder,camera,image_size,test_batch_s
 			count += 1
 			print ('Predict per batch size:%s ' %buffer_size)
 			test_x = np.concatenate(images_buffer, axis=0)
+			xx=normalize_input(test_x.astype(np.float32))
 			buffer_size,images_buffer=0,[]
-			test_y = model_cnn.predict(test_x)
+			test_y = model_cnn.predict(xx)
 			mask_up=test_y>9.42
 			mask_down=test_y<-9.42
 			test_y[mask_up]=9.42
@@ -67,7 +69,8 @@ def test_predict(test_image_log,test_image_folder,camera,image_size,test_batch_s
 	if images_buffer:
 		print ('Predict last insufficient batch size images:%s ' %buffer_size)
 		test_x = np.concatenate(images_buffer, axis=0)
-		test_y = model_cnn.predict(test_x)
+		xx=normalize_input(test_x.astype(np.float32))
+		test_y = model_cnn.predict(xx)
 		#print ('test_y', test_y)
 		mask_up=test_y>9.42
 		mask_down=test_y<-9.42
@@ -94,11 +97,11 @@ def main():
 
 	parser.add_argument('--resized-image-width', type=int, default=60, help='image resizing')
 	parser.add_argument('--resized-image-height', type=int,default=80, help='image resizing')
-	parser.add_argument('--nb-epoch', type=int, default=1, help='# of training epoch')
-	parser.add_argument('--trainNum', type=int, default=1, help='# of training total')
+	parser.add_argument('--nb-epoch', type=int, default=2, help='# of training epoch')
+	parser.add_argument('--trainNum', type=int, default=3, help='# of training total')
 	parser.add_argument('--camera', type=str, default='center', help='camera to use, default is center')
 	parser.add_argument('--batch_size', type=int, default=1, help='training batch size')
-	parser.add_argument('--test-batch_size', type=int, default=20, help='testing batch size')
+	parser.add_argument('--test-batch_size', type=int, default=60, help='testing batch size')
 	args = parser.parse_args()
 
 	dataset_path1 = args.dataset1
@@ -129,12 +132,20 @@ def main():
 	print('load weight...')
 	load_trained_model(model=model_cnn,weights_path=weights_path1)
 	print('load weight successfully...')
+	K.set_value(model_cnn.optimizer.lr, 2.5e-5)
+	learnRate_ini=K.get_value(model_cnn.optimizer.lr)
+	print("Initial learning rate: ", learnRate_ini)
+	learnRate=learnRate_ini
 
 	###############################################################
 	ii=1
 	while (ii <= train_Num ):
-		batch_size=1
-
+		learnRate*=0.5
+		K.set_value(model_cnn.optimizer.lr, learnRate)
+		learnRate=K.get_value(model_cnn.optimizer.lr)
+		batch_size=60
+		nb_epoch=20
+		print("This is current learn rate: ",learnRate)
 		print("start: ",ii,'/',train_Num)
 		print("batchsize: ",batch_size)
 		train_model(steering_log = steering_log1,
@@ -150,6 +161,8 @@ def main():
 		time.sleep(5)
 		#load_trained_model(model=model_cnn,weights_path=weights_path2)
 		#print('dataset weight 2 loaded successfully')
+		batch_size=60
+		nb_epoch=16
 		train_model(steering_log = steering_log2,
 		image_log = image_log2,
 		image_folder = camera_images2,

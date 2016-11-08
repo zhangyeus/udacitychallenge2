@@ -16,7 +16,7 @@ python original-predict.py --test-dataset /data/output --weights-path /data/cnn_
 python main.py --dataset1 /data/output --dataset2 /data/output --test-dataset /data/output
 
 6.load weight
-python original-predict.py --dataset1 /data/output --dataset2 /data/output --test-dataset /data/output --weights_path1 /data/cnn_weights.hdf5
+python weightloader.py --dataset1 /data/output --dataset2 /data/output --test-dataset /data/output --weights_path1 /data/cnn_weights.hdf5
 
 7. finally using training weights to predict
 python final-predict.py --test-dataset /data/output --weights-path /data/cnn_weights.hdf5
@@ -62,7 +62,7 @@ python main.py --dataset1 /home/wei/Documents/challenge2/data/output/dataset/ --
 
 
 6.6.load weight
-python weightloader.py --dataset1 /home/wei/Documents/challenge2/data/output/dataset/ --dataset2 /home/wei/Documents/challenge2/finalpre/output/dataset-2-2/ --test-dataset /home/wei/Documents/challenge2/finalpre/output/dataset-2-2/ --weights_path1 /home/wei/Documents/challenge2/code/src/cnn_weights.hdf5
+python weightloader.py --dataset1 /home/wei/Documents/challenge2/data/output/dataset/ --dataset2 /home/wei/Documents/challenge2/finalpre/output/dataset-2-2/ --test-dataset /home/wei/Documents/challenge2/finalpre/output/dataset-2-2/ --weights_path1 /home/wei/Documents/challenge2/successful_weights/cnn_weights.hdf5
 
 7.
 python final-predict.py --test-dataset /home/wei/Documents/challenge2/testdata/Challenge2/Test/ --weights-path /home/wei/Documents/challenge2/successful_weights/cnn_weights.hdf5

@@ -94,7 +94,7 @@ def main():
 	parser.add_argument('--resized-image-height', type=int, default=80, help='image resizing')
 	parser.add_argument('--camera', type=str, default='center', help='camera to use, default is center')
 	parser.add_argument('--batch_size', type=int, default=8, help='training batch size')
-	parser.add_argument('--test-batch_size', type=int, default=20, help='testing batch size')
+	parser.add_argument('--test-batch_size', type=int, default=60, help='testing batch size')
 	args = parser.parse_args()
 
 	test_dataset_path = args.test_dataset

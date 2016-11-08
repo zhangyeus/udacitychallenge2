@@ -30,8 +30,9 @@ def train_model(steering_log,model_cnn,image_log,image_folder,camera,batch_size,
                                  #timestamp_end=14751877262-640,
                                  shuffle = True)
 	model_saver = ModelCheckpoint(filepath="cnn_weights.hdf5", verbose=1, save_best_only=False)
-	model_cnn.fit_generator(train_generator, samples_per_epoch=samples_per_epoch, nb_epoch=nb_epoch,
+	hist = model_cnn.fit_generator(train_generator, samples_per_epoch=samples_per_epoch, nb_epoch=nb_epoch,
 						callbacks=[model_saver])
+	print(hist.history)
 	print('cnn_model successfully trained...')	
 
 def test_predict(test_image_log,test_image_folder,camera,image_size,test_batch_size,model_cnn,loops=None,fps=10):
@@ -55,8 +56,9 @@ def test_predict(test_image_log,test_image_folder,camera,image_size,test_batch_s
 			count += 1
 			print ('Predict per batch size:%s ' %buffer_size)
 			test_x = np.concatenate(images_buffer, axis=0)
+			xx=normalize_input(test_x.astype(np.float32))
 			buffer_size,images_buffer=0,[]
-			test_y = model_cnn.predict(test_x)
+			test_y = model_cnn.predict(xx)
 			mask_up=test_y>9.42
 			mask_down=test_y<-9.42
 			test_y[mask_up]=9.42
@@ -67,7 +69,8 @@ def test_predict(test_image_log,test_image_folder,camera,image_size,test_batch_s
 	if images_buffer:
 		print ('Predict last insufficient batch size images:%s ' %buffer_size)
 		test_x = np.concatenate(images_buffer, axis=0)
-		test_y = model_cnn.predict(test_x)
+		xx=normalize_input(test_x.astype(np.float32))
+		test_y = model_cnn.predict(xx)
 		#print ('test_y', test_y)
 		mask_up=test_y>9.42
 		mask_down=test_y<-9.42
@@ -94,11 +97,11 @@ def main():
 
 	parser.add_argument('--resized-image-width', type=int, default=60, help='image resizing')
 	parser.add_argument('--resized-image-height', type=int,default=80, help='image resizing')
-	parser.add_argument('--nb-epoch', type=int, default=4, help='# of training epoch')
-	parser.add_argument('--trainNum', type=int, default=4, help='# of training total')
+	parser.add_argument('--nb-epoch', type=int, default=10, help='# of training epoch')
+	parser.add_argument('--trainNum', type=int, default=1, help='# of training total')
 	parser.add_argument('--camera', type=str, default='center', help='camera to use, default is center')
-	parser.add_argument('--batch_size', type=int, default=4, help='training batch size')
-	parser.add_argument('--test-batch_size', type=int, default=20, help='testing batch size')
+	parser.add_argument('--batch_size', type=int, default=60, help='training batch size')
+	parser.add_argument('--test-batch_size', type=int, default=60, help='testing batch size')
 	args = parser.parse_args()
 
 	dataset_path1 = args.dataset1
@@ -129,15 +132,7 @@ def main():
 	###############################################################
 	ii=1
 	while (ii <= train_Num ):
-		if (ii<=1):
-			batch_size=20
-		if (ii>1 and ii<=2):
-			batch_size=8
-		if (ii>2 and ii<=3):
-			batch_size=4
-		if (ii > 3):
-			batch_size=2
-
+		nb_epoch=10
 		print("start: ",ii,'/',train_Num)
 		print("batchsize: ",batch_size)
 		train_model(steering_log = steering_log1,
@@ -153,6 +148,7 @@ def main():
 		time.sleep(5)
 		#load_trained_model(model=model_cnn,weights_path=weights_path2)
 		#print('dataset weight 2 loaded successfully')
+		nb_epoch=8
 		train_model(steering_log = steering_log2,
 		image_log = image_log2,
 		image_folder = camera_images2,
