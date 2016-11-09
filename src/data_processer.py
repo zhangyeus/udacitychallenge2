@@ -14,7 +14,7 @@ from collections import defaultdict
 from os import path
 from scipy.misc import imread, imresize
 
-from keras.applications import vgg16
+#from keras.applications import vgg16
 from keras import backend as K
 
 

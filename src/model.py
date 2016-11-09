@@ -1,4 +1,4 @@
-from keras.applications import vgg16
+#from keras.applications import vgg16
 from keras.models import Model, Sequential
 from keras.layers import Dense, Flatten, Dropout, Input, BatchNormalization
 from keras.layers import Convolution2D, MaxPooling2D
