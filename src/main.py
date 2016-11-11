@@ -97,10 +97,10 @@ def main():
 
 	parser.add_argument('--resized-image-width', type=int, default=60, help='image resizing')
 	parser.add_argument('--resized-image-height', type=int,default=80, help='image resizing')
-	parser.add_argument('--nb-epoch', type=int, default=10, help='# of training epoch')
-	parser.add_argument('--trainNum', type=int, default=1, help='# of training total')
+	parser.add_argument('--nb-epoch', type=int, default=4, help='# of training epoch')
+	parser.add_argument('--trainNum', type=int, default=3, help='# of training total')
 	parser.add_argument('--camera', type=str, default='center', help='camera to use, default is center')
-	parser.add_argument('--batch_size', type=int, default=60, help='training batch size')
+	parser.add_argument('--batch_size', type=int, default=20, help='training batch size')
 	parser.add_argument('--test-batch_size', type=int, default=60, help='testing batch size')
 	args = parser.parse_args()
 
@@ -129,10 +129,18 @@ def main():
 
 	model_cnn = build_cnn(image_size)
 	print('model  build successful...')
+	K.set_value(model_cnn.optimizer.lr, 2e-4)
+	learnRate_ini=K.get_value(model_cnn.optimizer.lr)
+	print("Initial learning rate: ", learnRate_ini)
+	learnRate=learnRate_ini
 	###############################################################
 	ii=1
 	while (ii <= train_Num ):
-		nb_epoch=10
+		learnRate*=0.5
+		K.set_value(model_cnn.optimizer.lr, learnRate)
+		learnRate=K.get_value(model_cnn.optimizer.lr)
+		nb_epoch=5
+		print("This is current learn rate: ",learnRate)
 		print("start: ",ii,'/',train_Num)
 		print("batchsize: ",batch_size)
 		train_model(steering_log = steering_log1,
@@ -148,7 +156,7 @@ def main():
 		time.sleep(5)
 		#load_trained_model(model=model_cnn,weights_path=weights_path2)
 		#print('dataset weight 2 loaded successfully')
-		nb_epoch=8
+		nb_epoch=3
 		train_model(steering_log = steering_log2,
 		image_log = image_log2,
 		image_folder = camera_images2,

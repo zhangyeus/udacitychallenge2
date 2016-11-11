@@ -43,9 +43,11 @@ def test_predict(test_image_log,test_image_folder,camera,image_size,test_batch_s
 	predict_steer_store,timestamps_store,images_buffer,buffer_size=[],[],[],0
 	image_stamps_keys = image_stamps.keys()
 	count = 0
+	total = len(image_stamps_keys)/test_batch_size*2
 	for timestamp in image_stamps_keys:
 		images = read_images(test_image_folder, camera, image_stamps[timestamp], image_size)
 		images_buffer.append(images)
+		#print("This is images shape:!!!:", images.shape)
 		buffer_size += images.shape[0]
 		timestamps_store.extend(image_stamps[timestamp])
 		# loops only for test
@@ -53,7 +55,8 @@ def test_predict(test_image_log,test_image_folder,camera,image_size,test_batch_s
 			break
 		if buffer_size >= test_batch_size:
 			count += 1
-			print ('Predict per batch size:%s ' %buffer_size)
+			percentage=(float(count)/total)*100
+			#print ('Predict per batch size:%s ' %buffer_size)
 			test_x = np.concatenate(images_buffer, axis=0)
 			xx=normalize_input(test_x.astype(np.float32))
 			buffer_size,images_buffer=0,[]
@@ -64,6 +67,8 @@ def test_predict(test_image_log,test_image_folder,camera,image_size,test_batch_s
 			test_y[mask_down]=-9.42
 			#print ('test_y', test_y)
 			predict_steer_store.extend(test_y)
+			print('Current Percentage; %.2f%%' %percentage)
+			#print ('Current batch process :%s, percentage: %s% ' %(buffer_size, percentage))
 	#the last insufficient buffer size images
 	if images_buffer:
 		print ('Predict last insufficient batch size images:%s ' %buffer_size)

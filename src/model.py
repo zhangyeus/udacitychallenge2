@@ -3,6 +3,8 @@ from keras.models import Model, Sequential
 from keras.layers import Dense, Flatten, Dropout, Input, BatchNormalization
 from keras.layers import Convolution2D, MaxPooling2D
 from keras.optimizers import Adam
+from keras.regularizers import l2, activity_l2
+from keras.constraints import maxnorm
 from keras import backend as K
 
 def build_cnn(image_size=None):
@@ -27,42 +29,21 @@ def build_cnn(image_size=None):
 	model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same'))
 	model.add(Dropout(0.5))
 	model.add(MaxPooling2D((2, 2), strides=(2, 2)))
-	#model.add(Convolution2D(128, 2, 2, activation='relu', border_mode='same'))
-	#model.add(Dropout(0.5))
-	#model.add(MaxPooling2D((2, 2), strides=(2, 2)))
-	##
+	model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same'))
+        model.add(Dropout(0.5))
+        model.add(MaxPooling2D((2, 2), strides=(2, 2)))
+
 	model.add(Flatten())
-	model.add(Dense(1024, activation='relu'))
+	model.add(Dense(4096, activation='relu',W_constraint=maxnorm(5),b_constraint=maxnorm(5)))
 	model.add(Dropout(0.5))
-	model.add(Dense(1024, activation='relu'))
+	model.add(Dense(1024, activation='tanh',W_constraint=maxnorm(5),b_constraint=maxnorm(5)))
 	model.add(Dropout(0.5))
 	model.add(Dense(1))
+
 	
 	##########################$ 6 conv ############################
-	'''
-	model=Sequential()
-	model.add(Convolution2D(64,3,3, activation='relu', border_mode='same', input_shape=inputShape))
-	model.add(Dropout(0.5))
-	model.add(Convolution2D(64,3,3, activation='relu', border_mode='same'))
-	model.add(Dropout(0.5))
-	model.add(MaxPooling2D((2, 2), strides=(2, 2)))
-	model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same'))
-	model.add(Dropout(0.5))
-	model.add(Convolution2D(128, 3, 3, activation='relu', border_mode='same'))
-	model.add(Dropout(0.5))
-	model.add(MaxPooling2D((2, 2), strides=(2, 2)))
-	#model.add(MaxPooling2D((2, 2), strides=(2, 2)))
-	#model.add(Convolution2D(48, 2, 2, activation='relu', border_mode='same'))
-	#model.add(Dropout(0.5))
-	#model.add(MaxPooling2D((2, 2), strides=(2, 2)))
-	##
-	model.add(Flatten())
-	model.add(Dense(1024, activation='relu'))
-	model.add(Dropout(0.5))
-	model.add(Dense(1024, activation='relu'))
-	#model.add(Dropout(0.5))
-	model.add(Dense(1))
-	'''
+
+
 	###############################################################
 
 	

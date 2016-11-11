@@ -45,17 +45,20 @@ def test_predict_new(test_image_folder,camera,image_size,test_batch_size,model_c
 	rootpath=path.join(test_image_folder, camera)
 	count=0
 	for rt, dirs, files in os.walk(rootpath):
+		total=len(files)/test_batch_size
 		for ff in files:
 			imgs=[]
 			fname=os.path.splitext(ff)
 			imgindex=fname[0]
 			#print("this is fname0:",fname[0])
 			#print("this is fname1:",fname[1])
-			img = imread(path.join(rootpath, '%s.png' % imgindex))
+			img = imread(path.join(rootpath, '%s.png' % imgindex))			        
 			img = imresize(img, size=image_size)
 			imgs.append(img)
 			#print('this is img shape: !!!!!! :', img.shape)
 			images = np.stack(imgs, axis=0)
+			if K.image_dim_ordering() == 'th':
+				images = np.transpose(images, axes = (0, 3, 1, 2))
 			#print('this is image shape: !!!!!! :', images.shape)
 			images_buffer.append(images)
 			buffer_size += images.shape[0]
@@ -66,7 +69,8 @@ def test_predict_new(test_image_folder,camera,image_size,test_batch_size,model_c
 				break
 			if buffer_size >= test_batch_size:
 				count += 1
-				print ('Predict per batch size:%s ' %buffer_size)
+				percentage=float(count)/total*100
+				#print ('Predict per batch size:%s ' %buffer_size)
 				test_x = np.concatenate(images_buffer, axis=0)
 				xx=normalize_input(test_x.astype(np.float32))
 				buffer_size,images_buffer=0,[]
@@ -76,6 +80,7 @@ def test_predict_new(test_image_folder,camera,image_size,test_batch_size,model_c
 				test_y[mask_up]=9.42
 				test_y[mask_down]=-9.42
 				predict_steer_store.extend(test_y)
+				print('Current Percentage: %.2f%%' %percentage)
 				#print("imgindex_store shape", len(imgindex_store))
 				#print("predict_steer_store shape",len(predict_steer_store))
 	if images_buffer:

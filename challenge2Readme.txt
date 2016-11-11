@@ -19,24 +19,24 @@ DATASET:
 
 Models
 	CNN:
-	layer1: Conv2D 64*3*3
+	layer1: Conv2D 64*3*3  activation: relu
 		Dropout 50%
-	layer2: Conv2D 64*3*3
-		Dropout 50%
-		MaxPool 2*2
-	layer3: Conv2D 128*3*3
+		
+	layer2: Conv2D 64*3*3  activation: relu
 		Dropout 50%
 		MaxPool 2*2
-	layer4: Conv2D 128*2*2
+	layer3: Conv2D 128*3*3 activation: relu
+		Dropout 50%
+		MaxPool 2*2
+	layer4: Conv2D 128*3*3 activation: relu
 		Dropout 50%
 		MaxPool 2*2
 	layer5:  - flatten
-	layer6: Fully connected, dense 4096
+	layer6: Fully connected, dense 4096 activation: relu
 		Dropout 50%
-	layer7: Fully connected, dense 1024
+	layer7: Fully connected, dense 1024 activation: tank
 		Dropout 50%
-	layer8: Fully connect, dense 1024
-		Output 
+	layer8: Full connected, dense 1
 
 	We added a restriction to the output where the absolute value of predicted steering angle cannot exceed 3*pi.  
 
@@ -56,6 +56,21 @@ How to run:
 	python evaluation_model_load_weights.py --dataset /data/output  --nb-epoch 2 --resized-image-width 60 --resized-image-height 80 --weights-path=/data/cnn_weights.hdf5
 
 
+	4. load weight to continue training
+	#################### Command to run ####################################################
+	python weightloader.py --dataset1 /data/output --dataset2 /data/output --dataset3 /data/output --test-dataset /data/output --weights_path1 /data/cnn_weights.hdf5
+
+	5. predict the test dataset (70g dataset)
+	#################### Command to run ####################################################
+	python final-predict.py --test-dataset /data/output --weights-path /data/cnn_weights.hdf5
+
+	6. training dataset(3 dataset)
+	#################### Command to run ####################################################
+	python trainNew.py --dataset1 /data/output --dataset2 /data/output --dataset3 /data/output --test-dataset /data/output
+
+
+Notes:
+run command 6 to train CNN and run command 5 to predict.
 
 
 Reference:

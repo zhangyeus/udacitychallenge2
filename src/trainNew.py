@@ -7,7 +7,6 @@ import matplotlib.pyplot as plt
 import csv
 import argparse
 import numpy as np
-import keras.backend as K 
 from os import path
 import time
 from data_processer import *
@@ -31,9 +30,12 @@ def train_model(steering_log,model_cnn,image_log,image_folder,camera,batch_size,
                                  #timestamp_end=14751877262-640,
                                  shuffle = True)
 	model_saver = ModelCheckpoint(filepath="cnn_weights.hdf5", verbose=1, save_best_only=False)
-	model_cnn.fit_generator(train_generator, samples_per_epoch=samples_per_epoch, nb_epoch=nb_epoch,
+	hist = model_cnn.fit_generator(train_generator, samples_per_epoch=samples_per_epoch, nb_epoch=nb_epoch,
 						callbacks=[model_saver])
+	print(hist.history)
 	print('cnn_model successfully trained...')	
+	##########################################################################################################
+
 def train_model_new(steering_log,model_cnn,image_log,image_folder,camera,batch_size,image_size,nb_epoch,fps=10):
 	time_scale = int(1e9) / fps
 	    # read steering and image log
@@ -68,6 +70,12 @@ def training_new_model(steering_log,model_cnn,image_log,image_folder,camera,batc
 			image_size=image_size,
 			nb_epoch=nb_epoch)
 		i+=1
+
+
+
+
+
+	##################################################################################################
 
 def test_predict(test_image_log,test_image_folder,camera,image_size,test_batch_size,model_cnn,loops=None,fps=10):
 	time_scale = int(1e9) / fps
@@ -132,7 +140,7 @@ def main():
 
 	parser.add_argument('--resized-image-width', type=int, default=60, help='image resizing')
 	parser.add_argument('--resized-image-height', type=int,default=80, help='image resizing')
-	parser.add_argument('--nb-epoch', type=int, default=2, help='# of training epoch')
+	parser.add_argument('--nb-epoch', type=int, default=4, help='# of training epoch')
 	parser.add_argument('--trainNum', type=int, default=1, help='# of training total')
 	parser.add_argument('--camera', type=str, default='center', help='camera to use, default is center')
 	parser.add_argument('--batch_size', type=int, default=20, help='training batch size')
@@ -173,21 +181,32 @@ def main():
 
 	model_cnn = build_cnn(image_size)
 	print('model  build successful...')
-	print('load weight...')
-	load_trained_model(model=model_cnn,weights_path=weights_path1)
-	print('load weight successfully...')
-	K.set_value(model_cnn.optimizer.lr, 5e-5)
+	K.set_value(model_cnn.optimizer.lr, 4e-4)
 	learnRate_ini=K.get_value(model_cnn.optimizer.lr)
 	print("Initial learning rate: ", learnRate_ini)
 	learnRate=learnRate_ini
-
 	###############################################################
 	ii=1
 	while (ii <= train_Num ):
 		learnRate*=0.5
+		#########train new model##########################################
+		nb_epoch=1
+		training_new_model(steering_log = steering_log3,
+		image_log = image_log3,
+		image_folder = camera_images3,
+		camera = camera,
+		batch_size = batch_size,
+		model_cnn = model_cnn,
+		nb_epoch = nb_epoch,
+		image_size =image_size
+		)
+		print('part2 training done 1/3')
+		time.sleep(2)
+		#########dataset 1 ############################################
+
 		K.set_value(model_cnn.optimizer.lr, learnRate)
 		learnRate=K.get_value(model_cnn.optimizer.lr)
-		nb_epoch=0
+		nb_epoch=2
 		print("This is current learn rate: ",learnRate)
 		print("start: ",ii,'/',train_Num)
 		print("batchsize: ",batch_size)
@@ -200,11 +219,12 @@ def main():
 		nb_epoch = nb_epoch,
 		image_size =image_size
 		)
-		print('part1 training done 1/3')
+		print('part1 training done 2/3')
 		time.sleep(2)
 		#load_trained_model(model=model_cnn,weights_path=weights_path2)
 		#print('dataset weight 2 loaded successfully')
-		nb_epoch=20
+		####################data set 2 #################################
+		nb_epoch=16
 		train_model(steering_log = steering_log2,
 		image_log = image_log2,
 		image_folder = camera_images2,
@@ -214,20 +234,11 @@ def main():
 		nb_epoch = nb_epoch,
 		image_size =image_size
 		)
-		print('part2 training done 2/3')
-		time.sleep(2)
-		##########train new model 21#########################
-		nb_epoch=0
-		training_new_model(steering_log = steering_log3,
-		image_log = image_log3,
-		image_folder = camera_images3,
-		camera = camera,
-		batch_size = batch_size,
-		model_cnn = model_cnn,
-		nb_epoch = nb_epoch,
-		image_size =image_size
-		)
 		print('part2 training done 3/3')
+		time.sleep(2)
+
+
+		
 
 
 		ii=ii+1
